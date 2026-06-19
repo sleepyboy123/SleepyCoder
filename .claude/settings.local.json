@@ -13,7 +13,10 @@
       "Bash(npx --yes tailwindcss init -p)",
       "Bash(npm list *)",
       "Bash(timeout 30 npm start)",
-      "Bash(npm uninstall *)"
+      "Bash(npm uninstall *)",
+      "Bash(bash \"C:/Users/Matthew/.claude/plugins/cache/claude-plugins-official/superpowers/6.0.3/skills/subagent-driven-development/scripts/review-package\" bd79b58 HEAD)",
+      "Bash(bash \"C:/Users/Matthew/.claude/plugins/cache/claude-plugins-official/superpowers/6.0.3/skills/subagent-driven-development/scripts/task-brief\" docs/superpowers/plans/2026-06-20-sleepy-coder.md 2)",
+      "Bash(npx tsc *)"
     ]
   }
 }
