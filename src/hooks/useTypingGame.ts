@@ -62,7 +62,7 @@ export function useTypingGame(
   }, [language, loadSnippet, stopTimer])
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    const { snippet, cursorIndex, errors, startTime, isComplete } = stateRef.current
+    const { snippet, isComplete } = stateRef.current
     if (!snippet || isComplete) return
 
     const { key } = e
