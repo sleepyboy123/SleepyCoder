@@ -29,6 +29,7 @@ export function useTypingGame(
   useEffect(() => { stateRef.current = state }, [state])
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const loadGenRef = useRef(0)
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -46,7 +47,9 @@ export function useTypingGame(
 
   const loadSnippet = useCallback(async (lang: Language) => {
     setIsLoading(true)
+    const gen = ++loadGenRef.current
     const snippet = await provider.getRandomSnippet(lang)
+    if (gen !== loadGenRef.current) return // stale — a newer load is in flight
     stopTimer()
     setElapsedMs(0)
     setState({ snippet, cursorIndex: 0, errors: new Set(), startTime: null, isComplete: false })
@@ -66,9 +69,9 @@ export function useTypingGame(
 
     if (key === 'Tab') {
       e.preventDefault()
-      const keysToProcess = Math.min(4, snippet.code.length - cursorIndex)
-      if (keysToProcess <= 0) return
       setState((prev) => {
+        const keysToProcess = Math.min(4, snippet.code.length - prev.cursorIndex)
+        if (keysToProcess <= 0) return prev
         const newErrors = new Set(prev.errors)
         let newIndex = prev.cursorIndex
         const newStartTime = prev.startTime ?? Date.now()
