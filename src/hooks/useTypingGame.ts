@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { Language, Snippet, SnippetProvider } from '../lib/snippets/types'
+import { Language, LANGUAGES, Snippet, SnippetProvider } from '../lib/snippets/types'
 import { staticProvider } from '../lib/snippets/staticProvider'
 
 interface GameState {
@@ -30,6 +30,7 @@ export function useTypingGame(
 
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const loadGenRef = useRef(0)
+  const skipNextLoadRef = useRef(false)
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -57,6 +58,10 @@ export function useTypingGame(
   }, [provider, stopTimer])
 
   useEffect(() => {
+    if (skipNextLoadRef.current) {
+      skipNextLoadRef.current = false
+      return
+    }
     loadSnippet(language)
     return () => stopTimer()
   }, [language, loadSnippet, stopTimer])
@@ -132,6 +137,33 @@ export function useTypingGame(
     loadSnippet(language)
   }, [language, loadSnippet])
 
+  const loadSpecificSnippet = useCallback(async (lang: Language, id: string) => {
+    setIsLoading(true)
+    const gen = ++loadGenRef.current
+    const snippet = await provider.getSnippet(lang, id)
+    if (gen !== loadGenRef.current) return
+    stopTimer()
+    setElapsedMs(0)
+    setState({ snippet, cursorIndex: 0, errors: new Map(), startTime: null, isComplete: false })
+    skipNextLoadRef.current = true
+    setLanguageState(lang)
+    setIsLoading(false)
+  }, [provider, stopTimer])
+
+  const loadRandom = useCallback(async () => {
+    const randomLang = LANGUAGES[Math.floor(Math.random() * LANGUAGES.length)]
+    setIsLoading(true)
+    const gen = ++loadGenRef.current
+    const snippet = await provider.getRandomSnippet(randomLang)
+    if (gen !== loadGenRef.current) return
+    stopTimer()
+    setElapsedMs(0)
+    setState({ snippet, cursorIndex: 0, errors: new Map(), startTime: null, isComplete: false })
+    skipNextLoadRef.current = true
+    setLanguageState(randomLang)
+    setIsLoading(false)
+  }, [provider, stopTimer])
+
   const setLanguage = useCallback((lang: Language) => {
     stopTimer()
     setElapsedMs(0)
@@ -165,6 +197,8 @@ export function useTypingGame(
     language,
     handleKeyDown,
     setLanguage,
+    loadSpecificSnippet,
+    loadRandom,
     reset,
     newSnippet,
   }

@@ -158,7 +158,7 @@ func partition(arr []int, low, high int) int {
   {
     id: 'go-fibonacci',
     language: 'go',
-    title: 'Fibonacci (Memoized)',
+    title: 'Fibonacci Memoized',
     code: `func fibonacci(n int, memo map[int]int) int {
     if n <= 1 {
         return n

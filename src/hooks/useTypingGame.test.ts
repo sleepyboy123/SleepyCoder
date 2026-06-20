@@ -9,6 +9,7 @@ const makeSnippet = (code: string): Snippet => ({
 const makeProvider = (code: string): SnippetProvider => ({
   getSnippet: async () => makeSnippet(code),
   getRandomSnippet: async () => makeSnippet(code),
+  listSnippets: async () => [makeSnippet(code)],
 })
 
 test('initial state: cursor at 0, not complete, elapsed 0', async () => {

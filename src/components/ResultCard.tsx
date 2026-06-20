@@ -22,19 +22,19 @@ export default function ResultCard({ wpm, accuracy, elapsedMs, onPlayAgain, onNe
 
       <div className="flex gap-12 text-center">
         <div>
-          <div className="text-6xl font-bold text-terminal-primary" style={{ textShadow: '0 0 20px #bf00ff' }}>
+          <div className="text-6xl font-bold text-terminal-accent" style={{ textShadow: '0 0 10px #9333ea' }}>
             {wpm}
           </div>
           <div className="text-terminal-untyped text-xs tracking-widest mt-2 uppercase">wpm</div>
         </div>
         <div>
-          <div className="text-6xl font-bold text-terminal-primary" style={{ textShadow: '0 0 20px #bf00ff' }}>
+          <div className="text-6xl font-bold text-terminal-accent" style={{ textShadow: '0 0 10px #9333ea' }}>
             {accuracy}%
           </div>
           <div className="text-terminal-untyped text-xs tracking-widest mt-2 uppercase">accuracy</div>
         </div>
         <div>
-          <div className="text-6xl font-bold text-terminal-primary" style={{ textShadow: '0 0 20px #bf00ff' }}>
+          <div className="text-6xl font-bold text-terminal-accent" style={{ textShadow: '0 0 10px #9333ea' }}>
             {formatTime(elapsedMs)}
           </div>
           <div className="text-terminal-untyped text-xs tracking-widest mt-2 uppercase">time</div>
@@ -44,7 +44,7 @@ export default function ResultCard({ wpm, accuracy, elapsedMs, onPlayAgain, onNe
       <div className="flex gap-4">
         <button
           onClick={onPlayAgain}
-          className="px-6 py-2 border border-terminal-border text-terminal-primary hover:border-terminal-accent hover:shadow-glow-sm transition-all duration-200 text-sm tracking-widest uppercase"
+          className="px-6 py-2 border border-terminal-accent text-terminal-accent hover:shadow-glow transition-all duration-200 text-sm tracking-widest uppercase"
         >
           {'[ PLAY AGAIN ]'}
         </button>

@@ -148,7 +148,7 @@ long long lcm(int a, int b) {
   {
     id: 'cpp-fibonacci-memo',
     language: 'cpp',
-    title: 'Fibonacci (Memoized)',
+    title: 'Fibonacci Memoized',
     code: `int fibonacci(int n, unordered_map<int, int>& memo) {
     if (n <= 1) return n;
     if (memo.count(n)) return memo[n];

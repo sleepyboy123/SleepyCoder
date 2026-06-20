@@ -144,7 +144,7 @@ public static void inorder(TreeNode root) {
   {
     id: 'java-fibonacci',
     language: 'java',
-    title: 'Fibonacci (Memoized)',
+    title: 'Fibonacci Memoized',
     code: `public static long fibonacci(int n, Map<Integer, Long> memo) {
     if (n <= 1) return n;
     if (memo.containsKey(n)) return memo.get(n);

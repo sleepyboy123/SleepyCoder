@@ -70,7 +70,7 @@ function merge(left: number[], right: number[]): number[] {
   {
     id: 'ts-fibonacci-memo',
     language: 'typescript',
-    title: 'Fibonacci (Memoized)',
+    title: 'Fibonacci Memoized',
     code: `function fibonacci(n: number, memo: Map<number, number> = new Map()): number {
     if (n <= 1) return n;
     if (memo.has(n)) return memo.get(n)!;
@@ -161,7 +161,7 @@ function merge(left: number[], right: number[]): number[] {
   {
     id: 'ts-flatten',
     language: 'typescript',
-    title: 'Flatten Array (Recursive)',
+    title: 'Flatten Array Recursive',
     code: `function flatten<T>(arr: (T | T[])[]): T[] {
     return arr.reduce<T[]>((acc, val) => {
         if (Array.isArray(val)) {

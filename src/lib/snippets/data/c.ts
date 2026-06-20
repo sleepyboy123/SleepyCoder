@@ -4,7 +4,7 @@ export const cSnippets: Snippet[] = [
   {
     id: 'c-fibonacci',
     language: 'c',
-    title: 'Fibonacci (Recursive)',
+    title: 'Fibonacci Recursive',
     code: `int fibonacci(int n) {
     if (n <= 1) return n;
     return fibonacci(n - 1) + fibonacci(n - 2);
@@ -85,7 +85,7 @@ export const cSnippets: Snippet[] = [
   {
     id: 'c-gcd',
     language: 'c',
-    title: 'GCD (Euclidean)',
+    title: 'GCD Euclidean',
     code: `int gcd(int a, int b) {
     while (b != 0) {
         int temp = b;

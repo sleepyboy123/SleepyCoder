@@ -10,6 +10,7 @@ export interface Snippet {
 export interface SnippetProvider {
   getSnippet(language: Language, id: string): Promise<Snippet>
   getRandomSnippet(language: Language): Promise<Snippet>
+  listSnippets(language: Language): Promise<Snippet[]>
 }
 
 export const LANGUAGES: Language[] = ['python', 'typescript', 'c', 'cpp', 'java', 'go', 'rust', 'bash']

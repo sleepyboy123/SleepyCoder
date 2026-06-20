@@ -30,6 +30,10 @@ class StaticSnippetProvider implements SnippetProvider {
     const snippets = SNIPPET_MAP[language]
     return snippets[Math.floor(Math.random() * snippets.length)]
   }
+
+  async listSnippets(language: Language): Promise<Snippet[]> {
+    return SNIPPET_MAP[language]
+  }
 }
 
 export const staticProvider = new StaticSnippetProvider()

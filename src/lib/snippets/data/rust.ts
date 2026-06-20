@@ -4,7 +4,7 @@ export const rustSnippets: Snippet[] = [
   {
     id: 'rust-fibonacci',
     language: 'rust',
-    title: 'Fibonacci (Recursive)',
+    title: 'Fibonacci Recursive',
     code: `fn fibonacci(n: u64) -> u64 {
     match n {
         0 => 0,

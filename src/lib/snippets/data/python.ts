@@ -16,7 +16,7 @@ export const pythonSnippets: Snippet[] = [
   {
     id: 'py-fibonacci',
     language: 'python',
-    title: 'Fibonacci (Recursive)',
+    title: 'Fibonacci Recursive',
     code: `def fibonacci(n):
     if n <= 1:
         return n
@@ -179,4 +179,10 @@ def solve(board):
                 return False
     return True`,
   },
+  {
+    id: 'py-hello-world',
+    language: 'python',
+    title: 'Hello World',
+    code: `print("hello world")`
+  }
 ]

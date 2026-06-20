@@ -25,7 +25,7 @@ sleepy_coder/
 │   │
 │   ├── components/
 │   │   ├── Header.tsx                  # Title bar + live WPM / accuracy counters
-│   │   ├── LanguageSelector.tsx        # 8-language tab strip
+│   │   ├── Sidebar.tsx                 # VSCode-style file explorer — language folders + snippet files + RND button
 │   │   ├── GameBar.tsx                 # Elapsed timer, progress bar, reset button
 │   │   ├── TypingArea.tsx              # Conditional router: loading → SnippetDisplay → ResultCard
 │   │   ├── SnippetDisplay.tsx          # Character-level highlighted code + blinking cursor
@@ -65,7 +65,7 @@ Pure presentational components. None of them own state — they receive props fr
 | Component | Responsibility |
 |---|---|
 | `Header` | App title + live WPM/accuracy. Shows `--` before the first keypress. |
-| `LanguageSelector` | Pill tabs for the 8 supported languages. Highlights the active one with a purple glow. |
+| `Sidebar` | VSCode-style file explorer. Language folders expand/collapse to reveal individual snippet files. Clicking a file loads that specific snippet. RND button at the top picks a random language and snippet. Folder open state is local to Sidebar. |
 | `GameBar` | Stopwatch (updates every 100ms), gradient progress bar, and a RST button. |
 | `TypingArea` | Decides what to render based on game state: a loading spinner, the `SnippetDisplay`, or the `ResultCard` on completion. |
 | `SnippetDisplay` | Splits the snippet's code string into individual character spans — correct chars in purple, errors in red/pink, untyped in dim. Renders a `↵` hint before every newline. The blinking cursor is a `cursor-caret` span injected at `cursorIndex`. |
@@ -81,9 +81,13 @@ Returns:
 {
   snippet, cursorIndex, errors, elapsedMs,
   isComplete, isLoading, wpm, accuracy, language,
-  handleKeyDown, setLanguage, reset, newSnippet
+  handleKeyDown, setLanguage, reset, newSnippet,
+  loadSpecificSnippet, loadRandom
 }
 ```
+
+- `loadSpecificSnippet(language, id)` — loads a named snippet by ID; used by Sidebar file clicks.
+- `loadRandom()` — picks a random language then a random snippet from it; used by the RND button.
 
 `handleKeyDown` is a stable callback (safe to attach to `window` once) — it reads current state via a `stateRef` rather than closing over state values directly. This avoids the stale-closure problem on the global keyboard listener.
 
@@ -107,10 +111,11 @@ The `SnippetProvider` interface is intentionally the only coupling point between
 interface SnippetProvider {
   getSnippet(language: Language, id: string): Promise<Snippet>
   getRandomSnippet(language: Language): Promise<Snippet>
+  listSnippets(language: Language): Promise<Snippet[]>
 }
 ```
 
-`useTypingGame` accepts a `provider` parameter (defaults to `staticProvider`). Swapping to an AI-generated backend requires only implementing this two-method interface — no changes to the hook, components, or anything else.
+`useTypingGame` accepts a `provider` parameter (defaults to `staticProvider`). Swapping to an AI-generated backend requires only implementing this three-method interface — no changes to the hook, components, or anything else.
 
 ### stateRef pattern — stable keyboard listener
 

@@ -8,6 +8,8 @@
   * {
     font-family: 'JetBrains Mono', 'Fira Code', monospace;
     box-sizing: border-box;
+    font-variant-ligatures: none;
+    font-feature-settings: "liga" 0, "calt" 0;
   }
   body {
     background-color: #0a0010;
