@@ -5,7 +5,7 @@ import ResultCard from './ResultCard'
 interface Props {
   snippet: Snippet | null
   cursorIndex: number
-  errors: Set<number>
+  errors: Map<number, string>
   wpm: number
   accuracy: number
   elapsedMs: number

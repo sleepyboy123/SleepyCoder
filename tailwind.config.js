@@ -7,10 +7,10 @@ module.exports = {
         terminal: {
           bg: '#0a0010',
           surface: '#12002a',
-          primary: '#c084fc',
-          untyped: '#4a3a5e',
+          primary: '#e879f9',
+          untyped: '#7a6a9e',
           error: '#ff4d8b',
-          accent: '#bf00ff',
+          accent: '#9333ea',
           border: '#3d1a52',
         },
       },

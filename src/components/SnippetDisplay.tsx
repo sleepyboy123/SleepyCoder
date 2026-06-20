@@ -3,7 +3,7 @@ import { Snippet } from '../lib/snippets/types'
 interface Props {
   snippet: Snippet
   cursorIndex: number
-  errors: Set<number>
+  errors: Map<number, string>
 }
 
 export default function SnippetDisplay({ snippet, cursorIndex, errors }: Props) {
@@ -14,21 +14,27 @@ export default function SnippetDisplay({ snippet, cursorIndex, errors }: Props) 
       <p className="text-terminal-untyped text-xs mb-4 tracking-widest uppercase">
         {'// '}{snippet.title}
       </p>
-      <pre className="text-base leading-7 whitespace-pre-wrap break-all font-mono">
+      <pre className="text-base leading-7 whitespace-pre-wrap font-mono overflow-x-auto">
         {chars.map((char, index) => {
           const isCorrect = index < cursorIndex && !errors.has(index)
           const isError = errors.has(index)
           const isCursor = index === cursorIndex
 
           if (char === '\n') {
+            const typedChar = isError ? errors.get(index) : null
             return (
               <span key={index}>
-                <span className="text-terminal-untyped opacity-40 select-none">↵</span>
+                {typedChar
+                  ? <span className="text-terminal-error select-none">{typedChar}</span>
+                  : <span className="text-terminal-untyped opacity-40 select-none">↵</span>
+                }
                 {isCursor && <span className="cursor-caret" aria-hidden="true" />}
                 {'\n'}
               </span>
             )
           }
+
+          const displayChar = isError ? (errors.get(index) ?? char) : char
 
           return (
             <span
@@ -42,7 +48,7 @@ export default function SnippetDisplay({ snippet, cursorIndex, errors }: Props) 
               }
             >
               {isCursor && <span className="cursor-caret" aria-hidden="true" />}
-              {char}
+              {displayChar}
             </span>
           )
         })}

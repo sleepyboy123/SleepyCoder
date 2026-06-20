@@ -5,7 +5,7 @@ import { staticProvider } from '../lib/snippets/staticProvider'
 interface GameState {
   snippet: Snippet | null
   cursorIndex: number
-  errors: Set<number>
+  errors: Map<number, string>
   startTime: number | null
   isComplete: boolean
 }
@@ -20,7 +20,7 @@ export function useTypingGame(
   const [state, setState] = useState<GameState>({
     snippet: null,
     cursorIndex: 0,
-    errors: new Set(),
+    errors: new Map(),
     startTime: null,
     isComplete: false,
   })
@@ -52,7 +52,7 @@ export function useTypingGame(
     if (gen !== loadGenRef.current) return // stale — a newer load is in flight
     stopTimer()
     setElapsedMs(0)
-    setState({ snippet, cursorIndex: 0, errors: new Set(), startTime: null, isComplete: false })
+    setState({ snippet, cursorIndex: 0, errors: new Map(), startTime: null, isComplete: false })
     setIsLoading(false)
   }, [provider, stopTimer])
 
@@ -72,11 +72,11 @@ export function useTypingGame(
       setState((prev) => {
         const keysToProcess = Math.min(4, snippet.code.length - prev.cursorIndex)
         if (keysToProcess <= 0) return prev
-        const newErrors = new Set(prev.errors)
+        const newErrors = new Map(prev.errors)
         let newIndex = prev.cursorIndex
         const newStartTime = prev.startTime ?? Date.now()
         for (let i = 0; i < keysToProcess; i++) {
-          if (snippet.code[newIndex] !== ' ') newErrors.add(newIndex)
+          if (snippet.code[newIndex] !== ' ') newErrors.set(newIndex, ' ')
           newIndex++
         }
         const isComplete = newIndex >= snippet.code.length
@@ -90,7 +90,7 @@ export function useTypingGame(
     if (key === 'Backspace') {
       setState((prev) => {
         if (prev.cursorIndex === 0) return prev
-        const newErrors = new Set(prev.errors)
+        const newErrors = new Map(prev.errors)
         newErrors.delete(prev.cursorIndex - 1)
         return { ...prev, cursorIndex: prev.cursorIndex - 1, errors: newErrors }
       })
@@ -105,9 +105,9 @@ export function useTypingGame(
 
     setState((prev) => {
       if (prev.cursorIndex >= snippet.code.length) return prev
-      const newErrors = new Set(prev.errors)
+      const newErrors = new Map(prev.errors)
       const newStartTime = prev.startTime ?? Date.now()
-      if (typed !== snippet.code[prev.cursorIndex]) newErrors.add(prev.cursorIndex)
+      if (typed !== snippet.code[prev.cursorIndex]) newErrors.set(prev.cursorIndex, typed!)
       const newIndex = prev.cursorIndex + 1
       const isComplete = newIndex >= snippet.code.length
       if (isComplete) stopTimer()
@@ -122,7 +122,7 @@ export function useTypingGame(
     setState((prev) => ({
       ...prev,
       cursorIndex: 0,
-      errors: new Set(),
+      errors: new Map(),
       startTime: null,
       isComplete: false,
     }))
@@ -138,7 +138,7 @@ export function useTypingGame(
     setState((prev) => ({
       ...prev,
       cursorIndex: 0,
-      errors: new Set(),
+      errors: new Map(),
       startTime: null,
       isComplete: false,
     }))

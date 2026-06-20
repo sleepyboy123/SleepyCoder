@@ -1,70 +1,154 @@
-# Getting Started with Create React App
+# Sleepy Coder
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A code typing game for developers. Pick a language, type real educational code snippets — Tower of Hanoi, merge sort, binary search, sudoku solver — and get your WPM and accuracy when you finish. The vibe is cyberpunk terminal, not a productivity tool.
 
-## Available Scripts
+## Getting Started
 
-In the project directory, you can run:
+```bash
+npm install
+npm start       # dev server at localhost:3000
+npm test        # run the test suite
+npm run build   # production build
+```
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Project Structure
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```
+sleepy_coder/
+├── public/
+├── src/
+│   ├── App.tsx                         # Root — wires keyboard listener, passes state to layout
+│   ├── index.tsx                       # React entry point
+│   ├── index.css                       # Tailwind directives, scanlines, cursor blink, custom scrollbar
+│   │
+│   ├── components/
+│   │   ├── Header.tsx                  # Title bar + live WPM / accuracy counters
+│   │   ├── LanguageSelector.tsx        # 8-language tab strip
+│   │   ├── GameBar.tsx                 # Elapsed timer, progress bar, reset button
+│   │   ├── TypingArea.tsx              # Conditional router: loading → SnippetDisplay → ResultCard
+│   │   ├── SnippetDisplay.tsx          # Character-level highlighted code + blinking cursor
+│   │   └── ResultCard.tsx             # End screen: WPM, accuracy, time + play-again buttons
+│   │
+│   ├── hooks/
+│   │   ├── useTypingGame.ts            # All game logic and state
+│   │   └── useTypingGame.test.ts       # 15 unit tests (TDD)
+│   │
+│   └── lib/
+│       └── snippets/
+│           ├── types.ts                # Language, Snippet, SnippetProvider interface
+│           ├── staticProvider.ts       # Static implementation of SnippetProvider
+│           └── data/
+│               ├── python.ts           # 10 Python snippets
+│               ├── typescript.ts       # 10 TypeScript snippets
+│               ├── c.ts               # 10 C snippets
+│               ├── cpp.ts             # 10 C++ snippets
+│               ├── java.ts            # 10 Java snippets
+│               ├── go.ts              # 10 Go snippets
+│               ├── rust.ts            # 10 Rust snippets
+│               └── bash.ts            # 10 Bash snippets
+│
+├── tailwind.config.js                  # Custom color tokens, font, glow shadows
+├── tsconfig.json
+└── package.json
+```
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Folder Breakdown
 
-### `npm run build`
+### `src/components/`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Pure presentational components. None of them own state — they receive props from `App.tsx` and render.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+| Component | Responsibility |
+|---|---|
+| `Header` | App title + live WPM/accuracy. Shows `--` before the first keypress. |
+| `LanguageSelector` | Pill tabs for the 8 supported languages. Highlights the active one with a purple glow. |
+| `GameBar` | Stopwatch (updates every 100ms), gradient progress bar, and a RST button. |
+| `TypingArea` | Decides what to render based on game state: a loading spinner, the `SnippetDisplay`, or the `ResultCard` on completion. |
+| `SnippetDisplay` | Splits the snippet's code string into individual character spans — correct chars in purple, errors in red/pink, untyped in dim. Renders a `↵` hint before every newline. The blinking cursor is a `cursor-caret` span injected at `cursorIndex`. |
+| `ResultCard` | Shown on snippet completion. Displays WPM, accuracy, elapsed time in large terminal text. Two buttons: play again (same snippet) and new snippet. |
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### `src/hooks/`
 
-### `npm run eject`
+`useTypingGame` is the entire game engine. It owns all mutable state and exposes a stable API to `App.tsx`.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Returns:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```ts
+{
+  snippet, cursorIndex, errors, elapsedMs,
+  isComplete, isLoading, wpm, accuracy, language,
+  handleKeyDown, setLanguage, reset, newSnippet
+}
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+`handleKeyDown` is a stable callback (safe to attach to `window` once) — it reads current state via a `stateRef` rather than closing over state values directly. This avoids the stale-closure problem on the global keyboard listener.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### `src/lib/snippets/`
 
-## Learn More
+The data layer. Three layers:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. **`types.ts`** — defines `Language`, `Snippet`, and the `SnippetProvider` interface. This is the AI swap seam (see Architecture below).
+2. **`staticProvider.ts`** — implements `SnippetProvider` backed by the static snippet arrays. Exported as a singleton `staticProvider`.
+3. **`data/*.ts`** — 10 snippets per language (80 total). Topics: Tower of Hanoi, fibonacci, binary search, merge sort, quicksort, sieve of Eratosthenes, linked list, BST insert, GCD, sudoku solver — educational algorithms implemented in each language's idiom.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## Architecture and Key Design Decisions
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### SnippetProvider as the AI swap seam
 
-### Analyzing the Bundle Size
+The `SnippetProvider` interface is intentionally the only coupling point between the game engine and the snippet source:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```ts
+interface SnippetProvider {
+  getSnippet(language: Language, id: string): Promise<Snippet>
+  getRandomSnippet(language: Language): Promise<Snippet>
+}
+```
 
-### Making a Progressive Web App
+`useTypingGame` accepts a `provider` parameter (defaults to `staticProvider`). Swapping to an AI-generated backend requires only implementing this two-method interface — no changes to the hook, components, or anything else.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### stateRef pattern — stable keyboard listener
 
-### Advanced Configuration
+`handleKeyDown` is attached to `window` in `App.tsx`. If `handleKeyDown` closed directly over React state, it would go stale — the listener would always see the state from the render it was created in.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+The solution: a `stateRef` that stays in sync with state via `useEffect`, and `handleKeyDown` reads from `stateRef.current` instead of the closed-over values. This keeps `handleKeyDown` a stable reference that only re-creates when `startTimer`/`stopTimer` change (effectively once on mount).
 
-### Deployment
+### Race guard on snippet loading
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Rapid language switching could cause a slow async fetch to overwrite a newer result. A generation counter prevents this:
 
-### `npm run build` fails to minify
+```ts
+const gen = ++loadGenRef.current
+const snippet = await provider.getRandomSnippet(lang)
+if (gen !== loadGenRef.current) return // stale — discard
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Permissive typing mode
+
+Wrong characters are allowed — the cursor still advances, and the incorrect positions are tracked in an `errors: Map<number, string>` (key = position, value = what was typed). The display shows the typed character in red rather than the original, so what you see matches what you pressed. Backspace removes the last character (and clears its error entry). The snippet is complete only when `cursorIndex >= snippet.code.length`, regardless of error count.
+
+### Tab and Enter handling
+
+Snippets use spaces for indentation (no tab characters). Pressing Tab fires 4 virtual space keypresses — each is checked individually against the snippet code, so Tab on a non-space line marks errors. Pressing Enter is mapped to `'\n'` and matched against newline characters in the snippet.
+
+### WPM and accuracy formulas
+
+- **WPM:** `(cursorIndex / 5) / (elapsedMs / 60000)` — standard 5-chars-per-word definition, computed live on every render.
+- **Accuracy:** `((cursorIndex - errors.size) / cursorIndex) * 100` — fraction of positions typed correctly. Backspace clears the error entry, so fixing a mistake improves accuracy.
+
+### Stateless by design
+
+No `localStorage`, no user accounts, no persistence. Every page load starts fresh. State lives entirely in `useTypingGame` and resets on snippet load, language switch, or the RST button.
+
+### Styling
+
+- **Tailwind CSS** for layout and utility classes. Custom color tokens (`terminal-bg`, `terminal-primary`, `terminal-error`, etc.) defined once in `tailwind.config.js`.
+- **Cyberpunk purple palette:** background `#0a0010`, primary/correct `#c084fc`, errors `#ff4d8b`, accent `#bf00ff`.
+- **Scanlines** via a `body::after` repeating-linear-gradient overlay in `index.css`.
+- **Cursor blink** via a CSS `@keyframes` animation on the `.cursor-caret` class.
+- **JetBrains Mono** as the monospace font throughout.
