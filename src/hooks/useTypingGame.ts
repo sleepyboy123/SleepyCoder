@@ -6,6 +6,7 @@ interface GameState {
   snippet: Snippet | null
   cursorIndex: number
   errors: Map<number, string>
+  totalErrors: number
   startTime: number | null
   isComplete: boolean
 }
@@ -21,6 +22,7 @@ export function useTypingGame(
     snippet: null,
     cursorIndex: 0,
     errors: new Map(),
+    totalErrors: 0,
     startTime: null,
     isComplete: false,
   })
@@ -53,7 +55,7 @@ export function useTypingGame(
     if (gen !== loadGenRef.current) return // stale — a newer load is in flight
     stopTimer()
     setElapsedMs(0)
-    setState({ snippet, cursorIndex: 0, errors: new Map(), startTime: null, isComplete: false })
+    setState({ snippet, cursorIndex: 0, errors: new Map(), totalErrors: 0, startTime: null, isComplete: false })
     setIsLoading(false)
   }, [provider, stopTimer])
 
@@ -79,15 +81,16 @@ export function useTypingGame(
         if (keysToProcess <= 0) return prev
         const newErrors = new Map(prev.errors)
         let newIndex = prev.cursorIndex
+        let newTotalErrors = prev.totalErrors
         const newStartTime = prev.startTime ?? Date.now()
         for (let i = 0; i < keysToProcess; i++) {
-          if (snippet.code[newIndex] !== ' ') newErrors.set(newIndex, ' ')
+          if (snippet.code[newIndex] !== ' ') { newErrors.set(newIndex, ' '); newTotalErrors++ }
           newIndex++
         }
         const isComplete = newIndex >= snippet.code.length
         if (isComplete) stopTimer()
         else if (!prev.startTime) startTimer(newStartTime)
-        return { ...prev, cursorIndex: newIndex, errors: newErrors, startTime: newStartTime, isComplete }
+        return { ...prev, cursorIndex: newIndex, errors: newErrors, totalErrors: newTotalErrors, startTime: newStartTime, isComplete }
       })
       return
     }
@@ -114,12 +117,13 @@ export function useTypingGame(
       if (prev.cursorIndex >= snippet.code.length) return prev
       const newErrors = new Map(prev.errors)
       const newStartTime = prev.startTime ?? Date.now()
-      if (typed !== snippet.code[prev.cursorIndex]) newErrors.set(prev.cursorIndex, typed!)
+      const isWrong = typed !== snippet.code[prev.cursorIndex]
+      if (isWrong) newErrors.set(prev.cursorIndex, typed!)
       const newIndex = prev.cursorIndex + 1
       const isComplete = newIndex >= snippet.code.length
       if (isComplete) stopTimer()
       else if (!prev.startTime) startTimer(newStartTime)
-      return { ...prev, cursorIndex: newIndex, errors: newErrors, startTime: newStartTime, isComplete }
+      return { ...prev, cursorIndex: newIndex, errors: newErrors, totalErrors: prev.totalErrors + (isWrong ? 1 : 0), startTime: newStartTime, isComplete }
     })
   }, [startTimer, stopTimer])
 
@@ -130,6 +134,7 @@ export function useTypingGame(
       ...prev,
       cursorIndex: 0,
       errors: new Map(),
+      totalErrors: 0,
       startTime: null,
       isComplete: false,
     }))
@@ -146,7 +151,7 @@ export function useTypingGame(
     if (gen !== loadGenRef.current) return
     stopTimer()
     setElapsedMs(0)
-    setState({ snippet, cursorIndex: 0, errors: new Map(), startTime: null, isComplete: false })
+    setState({ snippet, cursorIndex: 0, errors: new Map(), totalErrors: 0, startTime: null, isComplete: false })
     skipNextLoadRef.current = true
     setLanguageState(lang)
     setIsLoading(false)
@@ -160,7 +165,7 @@ export function useTypingGame(
     if (gen !== loadGenRef.current) return
     stopTimer()
     setElapsedMs(0)
-    setState({ snippet, cursorIndex: 0, errors: new Map(), startTime: null, isComplete: false })
+    setState({ snippet, cursorIndex: 0, errors: new Map(), totalErrors: 0, startTime: null, isComplete: false })
     skipNextLoadRef.current = true
     setLanguageState(randomLang)
     setIsLoading(false)
@@ -173,6 +178,7 @@ export function useTypingGame(
       ...prev,
       cursorIndex: 0,
       errors: new Map(),
+      totalErrors: 0,
       startTime: null,
       isComplete: false,
     }))
@@ -184,7 +190,7 @@ export function useTypingGame(
     : 0
 
   const accuracy = state.cursorIndex > 0
-    ? Math.round(((state.cursorIndex - state.errors.size) / state.cursorIndex) * 100)
+    ? Math.max(0, Math.round(((state.cursorIndex - state.totalErrors) / state.cursorIndex) * 100))
     : 100
 
   return {
