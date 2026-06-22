@@ -1,4 +1,4 @@
-import { Snippet } from '../types'
+﻿import { Snippet } from '../types'
 
 export const goSnippets: Snippet[] = [
   {
@@ -206,6 +206,169 @@ func insert(root *TreeNode, val int) *TreeNode {
         return half * half
     }
     return base * power(base, exp-1)
+}`,
+  },
+  {
+    id: 'go-two-sum',
+    language: 'go',
+    title: 'Two Sum HashMap',
+    code: `func twoSum(nums []int, target int) []int {
+    seen := make(map[int]int)
+    for i, num := range nums {
+        complement := target - num
+        if j, ok := seen[complement]; ok {
+            return []int{j, i}
+        }
+        seen[num] = i
+    }
+    return nil
+}`,
+  },
+  {
+    id: 'go-two-pointers',
+    language: 'go',
+    title: 'Two Pointers Palindrome',
+    code: `func isPalindrome(s string) bool {
+    left, right := 0, len(s)-1
+    for left < right {
+        if s[left] != s[right] {
+            return false
+        }
+        left++
+        right--
+    }
+    return true
+}
+
+func pairSumSorted(nums []int, target int) []int {
+    left, right := 0, len(nums)-1
+    for left < right {
+        s := nums[left] + nums[right]
+        if s == target { return []int{left, right} }
+        if s < target { left++ } else { right-- }
+    }
+    return nil
+}`,
+  },
+  {
+    id: 'go-sliding-window',
+    language: 'go',
+    title: 'Sliding Window No Repeat',
+    code: `func lengthOfLongestSubstring(s string) int {
+    seen := make(map[rune]int)
+    left, maxLen := 0, 0
+    for right, c := range s {
+        if idx, ok := seen[c]; ok && idx >= left {
+            left = idx + 1
+        }
+        seen[c] = right
+        if right-left+1 > maxLen {
+            maxLen = right - left + 1
+        }
+    }
+    return maxLen
+}`,
+  },
+  {
+    id: 'go-linked-list-ops',
+    language: 'go',
+    title: 'Linked List Reverse and Cycle',
+    code: `type ListNode struct { Val int; Next *ListNode }
+
+func reverseList(head *ListNode) *ListNode {
+    var prev *ListNode
+    curr := head
+    for curr != nil {
+        nxt := curr.Next
+        curr.Next = prev
+        prev = curr
+        curr = nxt
+    }
+    return prev
+}
+
+func hasCycle(head *ListNode) bool {
+    slow, fast := head, head
+    for fast != nil && fast.Next != nil {
+        slow = slow.Next
+        fast = fast.Next.Next
+        if slow == fast { return true }
+    }
+    return false
+}`,
+  },
+  {
+    id: 'go-tree-bfs',
+    language: 'go',
+    title: 'Binary Tree BFS',
+    code: `type TreeNodeBFS struct { Val int; Left, Right *TreeNodeBFS }
+
+func levelOrder(root *TreeNodeBFS) [][]int {
+    if root == nil { return nil }
+    var result [][]int
+    queue := []*TreeNodeBFS{root}
+    for len(queue) > 0 {
+        sz := len(queue)
+        level := make([]int, 0, sz)
+        for i := 0; i < sz; i++ {
+            node := queue[i]
+            level = append(level, node.Val)
+            if node.Left != nil { queue = append(queue, node.Left) }
+            if node.Right != nil { queue = append(queue, node.Right) }
+        }
+        queue = queue[sz:]
+        result = append(result, level)
+    }
+    return result
+}`,
+  },
+  {
+    id: 'go-number-of-islands',
+    language: 'go',
+    title: 'DFS Number of Islands',
+    code: `func dfsIsland(grid [][]byte, r, c int) {
+    if r < 0 || r >= len(grid) || c < 0 || c >= len(grid[0]) || grid[r][c] != '1' {
+        return
+    }
+    grid[r][c] = '0'
+    dfsIsland(grid, r+1, c); dfsIsland(grid, r-1, c)
+    dfsIsland(grid, r, c+1); dfsIsland(grid, r, c-1)
+}
+
+func numIslands(grid [][]byte) int {
+    count := 0
+    for r := range grid {
+        for c := range grid[r] {
+            if grid[r][c] == '1' {
+                dfsIsland(grid, r, c)
+                count++
+            }
+        }
+    }
+    return count
+}`,
+  },
+  {
+    id: 'go-knapsack',
+    language: 'go',
+    title: 'Knapsack DP',
+    code: `func knapsack(weights, values []int, capacity int) int {
+    n := len(weights)
+    dp := make([][]int, n+1)
+    for i := range dp {
+        dp[i] = make([]int, capacity+1)
+    }
+    for i := 1; i <= n; i++ {
+        for w := 0; w <= capacity; w++ {
+            dp[i][w] = dp[i-1][w]
+            if weights[i-1] <= w {
+                if v := dp[i-1][w-weights[i-1]] + values[i-1]; v > dp[i][w] {
+                    dp[i][w] = v
+                }
+            }
+        }
+    }
+    return dp[n][capacity]
 }`,
   },
 ]

@@ -93,6 +93,7 @@ export function useTypingGame(
     }
 
     if (key === 'Backspace') {
+      e.preventDefault()
       setState((prev) => {
         if (prev.cursorIndex === 0) return prev
         const newErrors = new Map(prev.errors)
@@ -108,6 +109,7 @@ export function useTypingGame(
 
     if (typed === null) return
 
+    e.preventDefault()
     setState((prev) => {
       if (prev.cursorIndex >= snippet.code.length) return prev
       const newErrors = new Map(prev.errors)

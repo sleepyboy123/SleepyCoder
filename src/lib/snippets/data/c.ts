@@ -1,4 +1,4 @@
-import { Snippet } from '../types'
+﻿import { Snippet } from '../types'
 
 export const cSnippets: Snippet[] = [
   {
@@ -145,6 +145,146 @@ void append(struct Node **head, int data) {
         return half * half;
     }
     return base * power(base, exp - 1);
+}`,
+  },
+  {
+    id: 'c-two-pointers',
+    language: 'c',
+    title: 'Two Pointers Palindrome',
+    code: `int is_palindrome(char* s, int len) {
+    int left = 0, right = len - 1;
+    while (left < right) {
+        if (s[left] != s[right]) return 0;
+        left++; right--;
+    }
+    return 1;
+}
+
+int* pair_sum_sorted(int* nums, int n, int target, int* out) {
+    int left = 0, right = n - 1;
+    while (left < right) {
+        int s = nums[left] + nums[right];
+        if (s == target) { out[0] = left; out[1] = right; return out; }
+        else if (s < target) left++;
+        else right--;
+    }
+    return NULL;
+}`,
+  },
+  {
+    id: 'c-sliding-window',
+    language: 'c',
+    title: 'Sliding Window No Repeat',
+    code: `int length_of_longest_substring(char* s) {
+    int seen[128];
+    memset(seen, -1, sizeof(seen));
+    int left = 0, max_len = 0;
+    for (int right = 0; s[right]; right++) {
+        int c = (unsigned char)s[right];
+        if (seen[c] >= left) {
+            left = seen[c] + 1;
+        }
+        seen[c] = right;
+        if (right - left + 1 > max_len)
+            max_len = right - left + 1;
+    }
+    return max_len;
+}`,
+  },
+  {
+    id: 'c-linked-list-ops',
+    language: 'c',
+    title: 'Linked List Reverse and Cycle',
+    code: `struct ListNode { int val; struct ListNode* next; };
+
+struct ListNode* reverse_list(struct ListNode* head) {
+    struct ListNode* prev = NULL;
+    struct ListNode* curr = head;
+    while (curr) {
+        struct ListNode* nxt = curr->next;
+        curr->next = prev;
+        prev = curr; curr = nxt;
+    }
+    return prev;
+}
+
+int has_cycle(struct ListNode* head) {
+    struct ListNode* slow = head;
+    struct ListNode* fast = head;
+    while (fast && fast->next) {
+        slow = slow->next;
+        fast = fast->next->next;
+        if (slow == fast) return 1;
+    }
+    return 0;
+}`,
+  },
+  {
+    id: 'c-tree-bfs',
+    language: 'c',
+    title: 'Binary Tree BFS',
+    code: `struct TreeNode { int val; struct TreeNode *left, *right; };
+
+int max_depth(struct TreeNode* root) {
+    if (!root) return 0;
+    int l = max_depth(root->left);
+    int r = max_depth(root->right);
+    return 1 + (l > r ? l : r);
+}
+
+void level_order(struct TreeNode* root) {
+    if (!root) return;
+    struct TreeNode* queue[1024];
+    int front = 0, back = 0;
+    queue[back++] = root;
+    while (front < back) {
+        struct TreeNode* node = queue[front++];
+        printf("%d ", node->val);
+        if (node->left)  queue[back++] = node->left;
+        if (node->right) queue[back++] = node->right;
+    }
+}`,
+  },
+  {
+    id: 'c-number-of-islands',
+    language: 'c',
+    title: 'DFS Number of Islands',
+    code: `void dfs(char** grid, int rows, int cols, int r, int c) {
+    if (r < 0 || r >= rows || c < 0 || c >= cols || grid[r][c] != '1') return;
+    grid[r][c] = '0';
+    dfs(grid, rows, cols, r+1, c);
+    dfs(grid, rows, cols, r-1, c);
+    dfs(grid, rows, cols, r, c+1);
+    dfs(grid, rows, cols, r, c-1);
+}
+
+int num_islands(char** grid, int rows, int cols) {
+    int count = 0;
+    for (int r = 0; r < rows; r++)
+        for (int c = 0; c < cols; c++)
+            if (grid[r][c] == '1') {
+                dfs(grid, rows, cols, r, c);
+                count++;
+            }
+    return count;
+}`,
+  },
+  {
+    id: 'c-knapsack',
+    language: 'c',
+    title: 'Knapsack DP',
+    code: `int knapsack(int* weights, int* values, int n, int capacity) {
+    int dp[n+1][capacity+1];
+    for (int i = 0; i <= n; i++) {
+        for (int w = 0; w <= capacity; w++) {
+            dp[i][w] = (i == 0) ? 0 : dp[i-1][w];
+            if (i > 0 && weights[i-1] <= w) {
+                int include = dp[i-1][w-weights[i-1]] + values[i-1];
+                if (include > dp[i][w]) dp[i][w] = include;
+            }
+        }
+    }
+    return dp[n][capacity];
 }`,
   },
 ]

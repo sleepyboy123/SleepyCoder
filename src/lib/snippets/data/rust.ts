@@ -1,4 +1,4 @@
-import { Snippet } from '../types'
+﻿import { Snippet } from '../types'
 
 export const rustSnippets: Snippet[] = [
   {
@@ -196,6 +196,164 @@ impl<T> List<T> {
     } else {
         base * power(base, exp - 1)
     }
+}`,
+  },
+  {
+    id: 'rust-two-sum',
+    language: 'rust',
+    title: 'Two Sum HashMap',
+    code: `use std::collections::HashMap;
+
+fn two_sum(nums: &[i32], target: i32) -> Vec<usize> {
+    let mut seen: HashMap<i32, usize> = HashMap::new();
+    for (i, &num) in nums.iter().enumerate() {
+        let complement = target - num;
+        if let Some(&j) = seen.get(&complement) {
+            return vec![j, i];
+        }
+        seen.insert(num, i);
+    }
+    vec![]
+}`,
+  },
+  {
+    id: 'rust-two-pointers',
+    language: 'rust',
+    title: 'Two Pointers Palindrome',
+    code: `fn is_palindrome(s: &str) -> bool {
+    let chars: Vec<char> = s.chars().collect();
+    let (mut left, mut right) = (0, chars.len().saturating_sub(1));
+    while left < right {
+        if chars[left] != chars[right] { return false; }
+        left += 1;
+        right -= 1;
+    }
+    true
+}
+
+fn pair_sum_sorted(nums: &[i32], target: i32) -> Option<(usize, usize)> {
+    let (mut left, mut right) = (0, nums.len() - 1);
+    while left < right {
+        match (nums[left] + nums[right]).cmp(&target) {
+            std::cmp::Ordering::Equal => return Some((left, right)),
+            std::cmp::Ordering::Less => left += 1,
+            std::cmp::Ordering::Greater => right -= 1,
+        }
+    }
+    None
+}`,
+  },
+  {
+    id: 'rust-sliding-window',
+    language: 'rust',
+    title: 'Sliding Window No Repeat',
+    code: `use std::collections::HashMap;
+
+fn length_of_longest_substring(s: &str) -> usize {
+    let mut seen: HashMap<char, usize> = HashMap::new();
+    let chars: Vec<char> = s.chars().collect();
+    let (mut left, mut max_len) = (0, 0);
+    for (right, &c) in chars.iter().enumerate() {
+        if let Some(&idx) = seen.get(&c) {
+            if idx >= left { left = idx + 1; }
+        }
+        seen.insert(c, right);
+        max_len = max_len.max(right - left + 1);
+    }
+    max_len
+}`,
+  },
+  {
+    id: 'rust-linked-list-ops',
+    language: 'rust',
+    title: 'Linked List Reverse and Cycle',
+    code: `fn reverse_list(list: Vec<i32>) -> Vec<i32> {
+    let mut result = list;
+    result.reverse();
+    result
+}
+
+// Floyd's cycle detection via index-based linked list
+// next[i] = Some(j) means node i points to node j
+fn has_cycle(next: &[Option<usize>]) -> bool {
+    if next.is_empty() { return false; }
+    let (mut slow, mut fast) = (0, 0);
+    loop {
+        slow = match next[slow] { Some(n) => n, None => return false };
+        fast = match next[fast] { Some(n) => n, None => return false };
+        fast = match next[fast] { Some(n) => n, None => return false };
+        if slow == fast { return true; }
+    }
+}`,
+  },
+  {
+    id: 'rust-tree-bfs',
+    language: 'rust',
+    title: 'Binary Tree BFS',
+    code: `use std::collections::VecDeque;
+
+type Link = Option<Box<TreeNodeBFS>>;
+struct TreeNodeBFS { val: i32, left: Link, right: Link }
+
+fn level_order(root: &Link) -> Vec<Vec<i32>> {
+    let mut result = vec![];
+    let mut queue = VecDeque::new();
+    if let Some(node) = root { queue.push_back(node.as_ref()); }
+    while !queue.is_empty() {
+        let sz = queue.len();
+        let mut level = vec![];
+        for _ in 0..sz {
+            let node = queue.pop_front().unwrap();
+            level.push(node.val);
+            if let Some(l) = &node.left { queue.push_back(l); }
+            if let Some(r) = &node.right { queue.push_back(r); }
+        }
+        result.push(level);
+    }
+    result
+}`,
+  },
+  {
+    id: 'rust-number-of-islands',
+    language: 'rust',
+    title: 'DFS Number of Islands',
+    code: `fn dfs(grid: &mut Vec<Vec<char>>, r: usize, c: usize) {
+    if grid[r][c] != '1' { return; }
+    grid[r][c] = '0';
+    if r + 1 < grid.len()     { dfs(grid, r+1, c); }
+    if r > 0                  { dfs(grid, r-1, c); }
+    if c + 1 < grid[0].len()  { dfs(grid, r, c+1); }
+    if c > 0                  { dfs(grid, r, c-1); }
+}
+
+fn num_islands(mut grid: Vec<Vec<char>>) -> usize {
+    let (rows, cols) = (grid.len(), grid[0].len());
+    let mut count = 0;
+    for r in 0..rows {
+        for c in 0..cols {
+            if grid[r][c] == '1' { dfs(&mut grid, r, c); count += 1; }
+        }
+    }
+    count
+}`,
+  },
+  {
+    id: 'rust-knapsack',
+    language: 'rust',
+    title: 'Knapsack DP',
+    code: `fn knapsack(weights: &[usize], values: &[usize], capacity: usize) -> usize {
+    let n = weights.len();
+    let mut dp = vec![vec![0usize; capacity + 1]; n + 1];
+    for i in 1..=n {
+        for w in 0..=capacity {
+            dp[i][w] = dp[i-1][w];
+            if weights[i-1] <= w {
+                let include = dp[i-1][w - weights[i-1]] + values[i-1];
+                if include > dp[i][w] { dp[i][w] = include; }
+            }
+        }
+    }
+    dp[n][capacity]
 }`,
   },
 ]

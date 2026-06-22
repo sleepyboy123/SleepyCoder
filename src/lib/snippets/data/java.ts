@@ -1,4 +1,4 @@
-import { Snippet } from '../types'
+﻿import { Snippet } from '../types'
 
 export const javaSnippets: Snippet[] = [
   {
@@ -176,6 +176,153 @@ public static long lcm(int a, int b) {
         return half * half;
     }
     return base * power(base, exp - 1);
+}`,
+  },
+  {
+    id: 'java-two-sum',
+    language: 'java',
+    title: 'Two Sum HashMap',
+    code: `public static int[] twoSum(int[] nums, int target) {
+    Map<Integer, Integer> seen = new HashMap<>();
+    for (int i = 0; i < nums.length; i++) {
+        int complement = target - nums[i];
+        if (seen.containsKey(complement)) {
+            return new int[]{seen.get(complement), i};
+        }
+        seen.put(nums[i], i);
+    }
+    return new int[]{};
+}`,
+  },
+  {
+    id: 'java-two-pointers',
+    language: 'java',
+    title: 'Two Pointers Palindrome',
+    code: `public static boolean isPalindrome(String s) {
+    int left = 0, right = s.length() - 1;
+    while (left < right) {
+        if (s.charAt(left) != s.charAt(right)) return false;
+        left++; right--;
+    }
+    return true;
+}
+
+public static int[] pairSumSorted(int[] nums, int target) {
+    int left = 0, right = nums.length - 1;
+    while (left < right) {
+        int s = nums[left] + nums[right];
+        if (s == target) return new int[]{left, right};
+        else if (s < target) left++;
+        else right--;
+    }
+    return new int[]{};
+}`,
+  },
+  {
+    id: 'java-sliding-window',
+    language: 'java',
+    title: 'Sliding Window No Repeat',
+    code: `public static int lengthOfLongestSubstring(String s) {
+    Map<Character, Integer> seen = new HashMap<>();
+    int left = 0, maxLen = 0;
+    for (int right = 0; right < s.length(); right++) {
+        char c = s.charAt(right);
+        if (seen.containsKey(c) && seen.get(c) >= left) {
+            left = seen.get(c) + 1;
+        }
+        seen.put(c, right);
+        maxLen = Math.max(maxLen, right - left + 1);
+    }
+    return maxLen;
+}`,
+  },
+  {
+    id: 'java-linked-list-ops',
+    language: 'java',
+    title: 'Linked List Reverse and Cycle',
+    code: `class ListNode { int val; ListNode next; ListNode(int v) { val = v; } }
+
+public static ListNode reverseList(ListNode head) {
+    ListNode prev = null, curr = head;
+    while (curr != null) {
+        ListNode nxt = curr.next;
+        curr.next = prev;
+        prev = curr; curr = nxt;
+    }
+    return prev;
+}
+
+public static boolean hasCycle(ListNode head) {
+    ListNode slow = head, fast = head;
+    while (fast != null && fast.next != null) {
+        slow = slow.next;
+        fast = fast.next.next;
+        if (slow == fast) return true;
+    }
+    return false;
+}`,
+  },
+  {
+    id: 'java-tree-bfs',
+    language: 'java',
+    title: 'Binary Tree BFS',
+    code: `class TreeNode { int val; TreeNode left, right; TreeNode(int v) { val = v; } }
+
+public static List<List<Integer>> levelOrder(TreeNode root) {
+    List<List<Integer>> result = new ArrayList<>();
+    if (root == null) return result;
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.offer(root);
+    while (!queue.isEmpty()) {
+        List<Integer> level = new ArrayList<>();
+        int sz = queue.size();
+        for (int i = 0; i < sz; i++) {
+            TreeNode node = queue.poll();
+            level.add(node.val);
+            if (node.left != null) queue.offer(node.left);
+            if (node.right != null) queue.offer(node.right);
+        }
+        result.add(level);
+    }
+    return result;
+}`,
+  },
+  {
+    id: 'java-number-of-islands',
+    language: 'java',
+    title: 'DFS Number of Islands',
+    code: `private static void dfs(char[][] grid, int r, int c) {
+    if (r < 0 || r >= grid.length || c < 0 || c >= grid[0].length || grid[r][c] != '1') return;
+    grid[r][c] = '0';
+    dfs(grid, r+1, c); dfs(grid, r-1, c);
+    dfs(grid, r, c+1); dfs(grid, r, c-1);
+}
+
+public static int numIslands(char[][] grid) {
+    int count = 0;
+    for (int r = 0; r < grid.length; r++)
+        for (int c = 0; c < grid[0].length; c++)
+            if (grid[r][c] == '1') { dfs(grid, r, c); count++; }
+    return count;
+}`,
+  },
+  {
+    id: 'java-knapsack',
+    language: 'java',
+    title: 'Knapsack DP',
+    code: `public static int knapsack(int[] weights, int[] values, int capacity) {
+    int n = weights.length;
+    int[][] dp = new int[n+1][capacity+1];
+    for (int i = 1; i <= n; i++) {
+        for (int w = 0; w <= capacity; w++) {
+            dp[i][w] = dp[i-1][w];
+            if (weights[i-1] <= w) {
+                dp[i][w] = Math.max(dp[i][w],
+                    dp[i-1][w-weights[i-1]] + values[i-1]);
+            }
+        }
+    }
+    return dp[n][capacity];
 }`,
   },
 ]

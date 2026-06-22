@@ -1,4 +1,4 @@
-import { Snippet } from '../types'
+﻿import { Snippet } from '../types'
 
 export const pythonSnippets: Snippet[] = [
   {
@@ -184,5 +184,141 @@ def solve(board):
     language: 'python',
     title: 'Hello World',
     code: `print("hello world")`
-  }
+  },
+  {
+    id: 'py-two-sum',
+    language: 'python',
+    title: 'Two Sum HashMap',
+    code: `def two_sum(nums, target):
+    seen = {}
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:
+            return [seen[complement], i]
+        seen[num] = i
+    return []`,
+  },
+  {
+    id: 'py-two-pointers',
+    language: 'python',
+    title: 'Two Pointers Palindrome',
+    code: `def is_palindrome(s):
+    left, right = 0, len(s) - 1
+    while left < right:
+        if s[left] != s[right]:
+            return False
+        left += 1
+        right -= 1
+    return True
+
+def pair_sum_sorted(nums, target):
+    left, right = 0, len(nums) - 1
+    while left < right:
+        s = nums[left] + nums[right]
+        if s == target:
+            return [left, right]
+        elif s < target:
+            left += 1
+        else:
+            right -= 1
+    return []`,
+  },
+  {
+    id: 'py-sliding-window',
+    language: 'python',
+    title: 'Sliding Window No Repeat',
+    code: `def length_of_longest_substring(s):
+    seen = {}
+    left = 0
+    max_len = 0
+    for right, char in enumerate(s):
+        if char in seen and seen[char] >= left:
+            left = seen[char] + 1
+        seen[char] = right
+        max_len = max(max_len, right - left + 1)
+    return max_len`,
+  },
+  {
+    id: 'py-linked-list-ops',
+    language: 'python',
+    title: 'Linked List Reverse and Cycle',
+    code: `def reverse_list(head):
+    prev, curr = None, head
+    while curr:
+        nxt = curr.next
+        curr.next = prev
+        prev = curr
+        curr = nxt
+    return prev
+
+def has_cycle(head):
+    slow = fast = head
+    while fast and fast.next:
+        slow = slow.next
+        fast = fast.next.next
+        if slow is fast:
+            return True
+    return False`,
+  },
+  {
+    id: 'py-tree-bfs',
+    language: 'python',
+    title: 'Binary Tree BFS',
+    code: `from collections import deque
+
+def level_order(root):
+    if not root:
+        return []
+    result, queue = [], deque([root])
+    while queue:
+        level = []
+        for _ in range(len(queue)):
+            node = queue.popleft()
+            level.append(node.val)
+            if node.left: queue.append(node.left)
+            if node.right: queue.append(node.right)
+        result.append(level)
+    return result
+
+def max_depth(root):
+    if not root: return 0
+    return 1 + max(max_depth(root.left), max_depth(root.right))`,
+  },
+  {
+    id: 'py-number-of-islands',
+    language: 'python',
+    title: 'DFS Number of Islands',
+    code: `def num_islands(grid):
+    if not grid: return 0
+    rows, cols = len(grid), len(grid[0])
+
+    def dfs(r, c):
+        if r < 0 or r >= rows or c < 0 or c >= cols or grid[r][c] != '1':
+            return
+        grid[r][c] = '0'
+        dfs(r+1, c); dfs(r-1, c); dfs(r, c+1); dfs(r, c-1)
+
+    count = 0
+    for r in range(rows):
+        for c in range(cols):
+            if grid[r][c] == '1':
+                dfs(r, c)
+                count += 1
+    return count`,
+  },
+  {
+    id: 'py-knapsack',
+    language: 'python',
+    title: 'Knapsack DP',
+    code: `def knapsack(weights, values, capacity):
+    n = len(weights)
+    dp = [[0] * (capacity + 1) for _ in range(n + 1)]
+    for i in range(1, n + 1):
+        for w in range(capacity + 1):
+            dp[i][w] = dp[i-1][w]
+            if weights[i-1] <= w:
+                dp[i][w] = max(dp[i][w],
+                    dp[i-1][w - weights[i-1]] + values[i-1])
+    return dp[n][capacity]`,
+  },
 ]
